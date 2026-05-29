@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EcoGestión — PGIRS Municipal</title>
+<link rel="stylesheet" href="css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ═══════════════════════ LOGIN ═══════════════════════ -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-brand">
+      <div class="brand-icon">🌿</div>
+      <h1>EcoGestión</h1>
+      <p>PGIRS Municipal · Inicia sesión para continuar</p>
+    </div>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos.</div>
+    <div class="form-group">
+      <label class="form-label">Usuario</label>
+      <input class="form-input" type="text" id="login-usuario"
+             placeholder="Ej: Admin Municipal">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Contraseña</label>
+      <input class="form-input" type="password" id="login-password"
+             placeholder="••••••••">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;"
+            onclick="Auth.login()">
+      Ingresar al sistema
+    </button>
+    <div style="margin-top:16px;font-size:11px;color:var(--text3);
+                font-family:var(--font-mono);text-align:center;">
+      Admin: <strong>Admin</strong> / <strong>admin123</strong><br>
+      Operador: <strong>Martínez</strong> / <strong>operador123</strong>
+    </div>
+  </div>
+</div>
+<!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">🌿</div>
+    <div class="brand-name">EcoGestión</div>
+    <div class="brand-sub">PGIRS Municipal</div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <div class="nav-item active" data-page="dashboard">
+      <span class="nav-icon">◈</span> Dashboard
+    </div>
+
+    <div class="nav-item" data-page="diagnostico">
+      <span class="nav-icon">📋</span> Diagnóstico Inicial
+      
+    </div>
+    <div class="nav-item" data-page="metas">
+      <span class="nav-icon">🎯</span> Metas PGIRS
+    </div>
+    <div class="nav-item" data-page="clasificar">
+      <span class="nav-icon">♻️</span> Clasificar Residuos
+    </div>
+    <div class="nav-item" data-page="cantidades">
+      <span class="nav-icon">⚖️</span> Cantidades Recolectadas
+    </div>
+    <div class="nav-item" data-page="indicadores">
+      <span class="nav-icon">📊</span> Indicadores PGIRS
+    </div>
+    <div class="nav-item" data-page="reportes">
+      <span class="nav-icon">📄</span> Reportes CSV
+    </div>
+    <div class="nav-item" data-page="alertas">
+      <span class="nav-icon">🚨</span> Alertas Orgánico
+      <span class="nav-badge" id="badge-alertas" style="background:var(--danger);">0</span>
+    </div>
+    <div class="nav-item" data-page="horarios">
+      <span class="nav-icon">🕐</span> Horarios
+    </div>
+    <div class="nav-item" data-page="campanas">
+      <span class="nav-icon">📢</span> Campañas
+      <span class="nav-badge">HU-18</span>
+    </div>
+    <div class="nav-item" data-page="puntos-criticos">
+      <span class="nav-icon">📍</span> Puntos Críticos
+      <span class="nav-badge">HU-14</span>
+    </div>
+    <div class="nav-item" data-page="roles">
+      <span class="nav-icon">🔐</span> Roles y Trazabilidad
+    </div>
+    <div class="nav-item" data-page="municipios">
+      <span class="nav-icon">🏛</span> Municipios
+      <span class="nav-badge">HU-19</span>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar" id="sb-avatar">AD</div>
+      <div>
+        <div class="user-name" id="sb-name">Admin Municipal</div>
+        <div class="user-role" id="sb-role">Administrador</div>
+      </div>
+    </div>
+    <div class="api-status" id="api-status">
+      <span class="status-dot" id="status-dot">●</span>
+      <span id="status-text">Conectando API...</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════ MAIN ═══════════════════════ -->
+<main class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+    <div class="topbar-title" id="topbar-title">Dashboard</div>
+    <span class="topbar-badge" id="topbar-badge"
+          style="cursor:pointer;" onclick="goTo('municipios')">
+      🏛 <span id="municipio-activo-nombre">Cargando...</span>
+    </span>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="topbar-badge" id="topbar-rol">—</span>
+      <span id="topbar-alertas" style="
+        background:rgba(248,113,113,.15);
+        border:1px solid rgba(248,113,113,.3);
+        color:var(--danger);
+        font-size:11px;
+        font-family:var(--font-mono);
+        padding:4px 10px;
+        border-radius:20px;
+        display:none;">
+        🚨 <span id="topbar-alertas-count">0</span> alerta(s)
+      </span>
+      <button class="btn-logout" onclick="Auth.logout()">Cerrar sesión ↗</button>
+    </div>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <section class="page active" id="page-dashboard">
+  <div class="page-header">
+    <h1>Panel de Control Ambiental</h1>
+    <p>Indicadores del PGIRS en tiempo real · Actualización automática cada 30 segundos</p>
+  </div>
+
+  <div class="sprint-header">
+    <div class="sprint-info">
+      <h3>Dashboard ambiental</h3>
+      <p>Gráficas en tiempo real · Datos desde API REST · Canvas API nativa</p>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="grid-4" style="margin-bottom:20px;">
+    <div class="stat-card green">
+      <div class="stat-label">Total Recolectado</div>
+      <div class="stat-value" id="d-total">—</div>
+      <div class="stat-unit">toneladas</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-label">Reciclable</div>
+      <div class="stat-value" id="d-rec">—</div>
+      <div class="stat-unit">toneladas</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">Orgánico</div>
+      <div class="stat-value" id="d-org">—</div>
+      <div class="stat-unit">toneladas</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">No Aprovechable</div>
+      <div class="stat-value" id="d-no">—</div>
+      <div class="stat-unit">toneladas</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- GRÁFICA DE BARRAS -->
+    <div class="card">
+      <div class="card-title">Evolución por fecha (últimos 7 registros)</div>
+      <canvas id="grafica-barras"
+        height="180"
+        style="width:100%;display:block;border-radius:8px;">
+      </canvas>
+      <div style="margin-top:8px;font-size:11px;
+                  color:var(--text3);font-family:var(--font-mono);">
+        Eje X: fechas de registro · Eje Y: toneladas
+      </div>
+    </div>
+
+    <!-- DONUT + BARRAS DE PROGRESO -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="card">
+        <div class="card-title">Distribución por tipo</div>
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 36 36" id="donut-svg">
+            <circle cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#234030" stroke-width="3.2"/>
+            <circle id="arc-org" cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#4ade80" stroke-width="3.2"
+                    stroke-dasharray="0 100" stroke-dashoffset="25"
+                    stroke-linecap="round"/>
+            <circle id="arc-rec" cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#60a5fa" stroke-width="3.2"
+                    stroke-dasharray="0 100" stroke-dashoffset="0"
+                    stroke-linecap="round"/>
+            <circle id="arc-no" cx="18" cy="18" r="15.9" fill="none"
+                    stroke="#fb923c" stroke-width="3.2"
+                    stroke-dasharray="0 100" stroke-dashoffset="0"
+                    stroke-linecap="round"/>
+            <text x="18" y="20" text-anchor="middle" fill="#e8f5ec"
+                  font-size="4" font-family="'DM Serif Display',serif"
+                  id="donut-label">—</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#4ade80"></div>
+              <span id="leg-org">Orgánico — —</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#60a5fa"></div>
+              <span id="leg-rec">Reciclable — —</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#fb923c"></div>
+              <span id="leg-no">No Aprovechable — —</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Tasa de aprovechamiento</div>
+        <div class="progress-wrap">
+          <div class="progress-label">
+            <span>Aprovechamiento (Org + Rec)</span>
+            <strong id="ind-aprov-pct">—%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill green" id="bar-aprov" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-label">
+            <span>No Aprovechable</span>
+            <strong id="ind-no-pct">—%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill orange" id="bar-no" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-label">
+            <span>Reciclable</span>
+            <strong id="ind-rec-pct">—%</strong>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill blue" id="bar-rec" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <!-- ══ DIAGNÓSTICO ══ -->
+  <section class="page" id="page-diagnostico">
+    <div class="page-header">
+      <h1>Diagnóstico Inicial de Residuos</h1>
+      <p>Registra la línea base del PGIRS.</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nuevo Diagnóstico</div>
+        <div id="alert-diag" class="alert"></div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">Año <span class="req">*</span></label>
+            <input class="form-input" type="number" id="d-anio" placeholder="2025" min="2000" max="2099">
+            <div class="form-error" id="e-d-anio"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Período <span class="req">*</span></label>
+            <select class="form-select" id="d-periodo">
+              <option value="">Seleccione...</option>
+              <option>I Semestre</option><option>II Semestre</option>
+              <option>Trimestre I</option><option>Trimestre II</option>
+              <option>Trimestre III</option><option>Trimestre IV</option>
+              <option>Anual</option>
+            </select>
+            <div class="form-error" id="e-d-periodo"></div>
+          </div>
+        </div>
+        <div class="section-title">Cantidades por tipo (toneladas)</div>
+        <div class="input-row">
+          <div class="form-group"><label class="form-label">🌱 Orgánico</label><input class="form-input" type="number" id="d-organico" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="form-group"><label class="form-label">♻️ Reciclable</label><input class="form-input" type="number" id="d-reciclable" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="input-row">
+          <div class="form-group"><label class="form-label">🚫 No Aprovechable</label><input class="form-input" type="number" id="d-noaprove" placeholder="0.00" step="0.01" min="0"></div>
+          <div class="form-group"><label class="form-label">⚠️ Especial</label><input class="form-input" type="number" id="d-especial" placeholder="0.00" step="0.01" min="0"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observaciones</label>
+          <textarea class="form-textarea" id="d-obs" placeholder="Contexto del diagnóstico..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="API.guardarDiagnostico()">💾 Guardar Diagnóstico</button>
+          <button class="btn btn-ghost" onclick="UI.limpiarForm(['d-anio','d-organico','d-reciclable','d-noaprove','d-especial','d-obs'], 'd-periodo')">Limpiar</button>
+        </div>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:12px;">Diagnósticos registrados</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Año / Período</th><th>Orgánico</th><th>Reciclable</th><th>No Aprov.</th><th>Total</th></tr></thead>
+            <tbody id="tbody-diag"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ METAS ══ -->
+  <section class="page" id="page-metas">
+    <div class="page-header">
+      <h1>Definir Metas del PGIRS</h1>
+      <p>Metas de reducción/aprovechamiento </p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nueva Meta</div>
+        <div id="alert-meta" class="alert"></div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">Período <span class="req">*</span></label>
+            <select class="form-select" id="m-periodo">
+              <option value="">Seleccione...</option>
+              <option>2025 — I Semestre</option><option>2025 — II Semestre</option>
+              <option>2025 — Anual</option><option>2026 — Anual</option>
+            </select>
+            <div class="form-error" id="e-m-periodo"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo Residuo <span class="req">*</span></label>
+            <select class="form-select" id="m-tipo">
+              <option value="">Seleccione...</option>
+              <option>Orgánico</option><option>Reciclable</option>
+              <option>No Aprovechable</option><option>Especial</option>
+            </select>
+            <div class="form-error" id="e-m-tipo"></div>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">Meta (toneladas) <span class="req">*</span></label>
+            <input class="form-input" type="number" id="m-valor" placeholder="0.00" step="0.01" min="0">
+            <div class="form-error" id="e-m-valor"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Diagnóstico base</label>
+            <select class="form-select" id="m-diag"><option value="">Sin asociar</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Indicador clave</label>
+          <input class="form-input" type="text" id="m-indicador" placeholder="Ej: % reducción, toneladas aprovechadas">
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="API.guardarMeta()">🎯 Registrar Meta</button>
+          <button class="btn btn-ghost" onclick="UI.limpiarForm(['m-valor','m-indicador'], 'm-periodo', 'm-tipo', 'm-diag')">Limpiar</button>
+        </div>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:12px;">Metas registradas</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Período</th><th>Tipo</th><th>Meta (t)</th><th>Base</th></tr></thead>
+            <tbody id="tbody-metas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CLASIFICAR ══ -->
+  <section class="page" id="page-clasificar">
+    <div class="page-header">
+      <h1>Clasificar Residuos Recolectados</h1>
+      <p>Separación en la fuente según Decreto 1077/2015</p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Nuevo Registro</div>
+        <div id="alert-clas" class="alert"></div>
+        <div class="form-group">
+          <label class="form-label">Tipo de Residuo <span class="req">*</span></label>
+          <select class="form-select" id="c-tipo">
+            <option value="">Seleccione tipo...</option>
+            <option value="Orgánico">🌱 Orgánico</option>
+            <option value="Reciclable">♻️ Reciclable</option>
+            <option value="No Aprovechable">🚫 No Aprovechable</option>
+            <option value="Especial">⚠️ Especial / Peligroso</option>
+          </select>
+          <div class="form-error" id="e-c-tipo"></div>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">Fecha Recolección <span class="req">*</span></label>
+            <input class="form-input" type="date" id="c-fecha">
+            <div class="form-error" id="e-c-fecha"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ruta / Zona</label>
+            <input class="form-input" type="text" id="c-ruta" placeholder="Zona Norte">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vehículo recolector</label>
+          <input class="form-input" type="text" id="c-vehiculo" placeholder="Placa o ID">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observaciones</label>
+          <textarea class="form-textarea" id="c-obs" placeholder="Estado, incidencias..."></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="API.guardarClasificacion()">📁 Registrar Clasificación</button>
+          <button class="btn btn-ghost" onclick="UI.limpiarForm(['c-ruta','c-vehiculo','c-obs'],'c-tipo')">Limpiar</button>
+        </div>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:12px;">Registros de clasificación</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Zona</th></tr></thead>
+            <tbody id="tbody-clas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CANTIDADES ══ -->
+  <section class="page" id="page-cantidades">
+    <div class="page-header">
+      <div class="story-tag">🎫 SCRUM-10 · Highest</div>
+      <h1>Cantidades Recolectadas</h1>
+      <p id="cant-subtitle">Historial de cantidades registradas por tipo de residuo</p>
+    </div>
+
+    <!-- FORMULARIO — solo visible para operador -->
+    <div id="cant-form-section" class="grid-2">
+      <div class="card">
+        <div class="card-title">Nuevo Registro de Cantidades</div>
+        <div id="alert-cant" class="alert"></div>
+        <div class="form-group">
+          <label class="form-label">Fecha</label>
+          <input class="form-input" type="date" id="q-fecha">
+          <div class="form-hint">Si se deja vacía, se asigna la fecha actual.</div>
+        </div>
+        <div class="section-title">Cantidades por tipo (toneladas)</div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">🌱 Orgánico</label>
+            <input class="form-input" type="number" id="q-organico"
+                  placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+            <div class="form-error" id="e-q-organico"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">♻️ Reciclable</label>
+            <input class="form-input" type="number" id="q-reciclable"
+                  placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">🚫 No Aprovechable</label>
+            <input class="form-input" type="number" id="q-noaprove"
+                  placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">⚠️ Especial</label>
+            <input class="form-input" type="number" id="q-especial"
+                  placeholder="0.00" step="0.01" min="0" oninput="calcTotal()">
+          </div>
+        </div>
+        <div class="total-box">
+          <span>Total calculado</span>
+          <strong id="q-total-calc">0.00 t</strong>
+        </div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn btn-primary" onclick="API.guardarCantidad()">
+            ⚖️ Guardar Registro
+          </button>
+          <button class="btn btn-ghost" onclick="limpiarCantidades()">
+            Limpiar
+          </button>
+        </div>
+      </div>
+
+      <!-- TABLA al lado del formulario (operador) -->
+      <div id="cant-tabla-lado">
+        <div class="card-title" style="margin-bottom:12px;">
+          Historial de cantidades
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Orgánico</th>
+                <th>Reciclable</th><th>No Aprov.</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-cant"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLA COMPLETA — solo visible para admin -->
+    <div id="cant-admin-section" style="display:none;">
+      <div class="card-title" style="margin-bottom:12px;">
+        Historial de cantidades recolectadas
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th><th>Orgánico</th>
+              <th>Reciclable</th><th>No Aprov.</th><th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-cant-admin"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ INDICADORES ══ -->
+  <section class="page" id="page-indicadores">
+    <div class="page-header">
+      <h1>Indicadores Básicos del PGIRS</h1>
+      <p>Datos en tiempo real </p>
+    </div>
+    <div class="grid-4" style="margin-bottom:24px;">
+      <div class="stat-card green"><div class="stat-label">Total General</div><div class="stat-value" id="i-total">—</div><div class="stat-unit">toneladas</div></div>
+      <div class="stat-card green"><div class="stat-label">Orgánico</div><div class="stat-value" id="i-org">—</div><div class="stat-unit">toneladas</div></div>
+      <div class="stat-card blue"><div class="stat-label">Reciclable</div><div class="stat-value" id="i-rec">—</div><div class="stat-unit">toneladas</div></div>
+      <div class="stat-card orange"><div class="stat-label">No Aprovechable</div><div class="stat-value" id="i-no">—</div><div class="stat-unit">toneladas</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Indicadores normativos</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Tasa de aprovechamiento</span><strong id="i-aprov">—%</strong></div>
+          <div class="progress-bar"><div class="progress-fill green" id="ib-aprov" style="width:0%"></div></div>
+        </div>
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-label"><span>No Aprovechable</span><strong id="i-no-pct">—%</strong></div>
+          <div class="progress-bar"><div class="progress-fill orange" id="ib-no" style="width:0%"></div></div>
+        </div>
+        <div class="progress-wrap" style="margin-top:12px;">
+          <div class="progress-label"><span>Reciclable</span><strong id="i-rec-pct">—%</strong></div>
+          <div class="progress-bar"><div class="progress-fill blue" id="ib-rec" style="width:0%"></div></div>
+        </div>
+        <hr class="divider">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">
+          Fuente: cantidades registradas · Decreto 1077/2015
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Registros en base de datos</div>
+        <div class="meta-row"><div class="meta-key">Diagnósticos</div><div class="meta-val" id="cnt-diag">—</div></div>
+        <div class="meta-row"><div class="meta-key">Metas definidas</div><div class="meta-val" id="cnt-metas">—</div></div>
+        <div class="meta-row"><div class="meta-key">Clasificaciones</div><div class="meta-val" id="cnt-clas">—</div></div>
+        <div class="meta-row"><div class="meta-key">Registros cantidad</div><div class="meta-val" id="cnt-cant">—</div></div>
+        <div class="meta-row"><div class="meta-key">Usuarios</div><div class="meta-val" id="cnt-usr">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ROLES  ══ -->
+  <section class="page" id="page-roles">
+    <div class="page-header">
+      <h1>Roles y Trazabilidad</h1>
+      <p>Usuarios, permisos y log de acciones </p>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Usuarios del sistema</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Rol</th><th>Creado</th></tr></thead>
+            <tbody id="tbody-users"></tbody>
+          </table>
+        </div>
+        <div id="admin-only" style="margin-top:16px;">
+          <div class="section-title">Nuevo usuario (solo Admin)</div>
+          <div id="alert-user" class="alert"></div>
+          <div class="input-row">
+            <div class="form-group">
+              <label class="form-label">Nombre <span class="req">*</span></label>
+              <input class="form-input" type="text" id="u-nombre" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rol</label>
+              <select class="form-select" id="u-rol">
+                <option value="operador">Operador</option>
+                <option value="administrador">Administrador</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="API.crearUsuario()">+ Crear Usuario</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Historial de acciones (trazabilidad)</div>
+        <div id="log-container" style="max-height:420px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+ <!-- ══ Reportes  ══ -->
+  </section>
+    <section class="page" id="page-reportes">
+    <div class="page-header">
+      <h1>Generar Reportes CSV</h1>
+      <p>Descarga el reporte del PGIRS con diagnósticos, metas y cantidades</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Configurar reporte</div>
+
+        <div class="form-group">
+          <label class="form-label">Filtrar por período</label>
+          <select class="form-select" id="rep-periodo">
+            <option value="">Todos los registros</option>
+            <option value="2025">Año 2025</option>
+            <option value="2024">Año 2024</option>
+            <option value="2025-I Semestre">2025 — I Semestre</option>
+            <option value="2025-II Semestre">2025 — II Semestre</option>
+            <option value="2024-I Semestre">2024 — I Semestre</option>
+            <option value="2024-II Semestre">2024 — II Semestre</option>
+          </select>
+          <div class="form-hint">
+            Si no selecciona período, el reporte incluye todos los registros.
+          </div>
+        </div>
+
+        <div style="background:var(--surface);border:1px solid var(--border);
+                    border-radius:var(--r);padding:16px;margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:10px;">
+            El archivo CSV incluye:
+          </div>
+          <div style="font-size:13px;color:var(--text2);
+                      display:flex;flex-direction:column;gap:6px;">
+            <span>📋 Diagnósticos iniciales de residuos</span>
+            <span>🎯 Metas PGIRS definidas</span>
+            <span>⚖️ Cantidades recolectadas por tipo</span>
+            <span>📊 Resumen de indicadores normativos</span>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="descargarReporte()">
+            ⬇️ Descargar CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Información del reporte</div>
+        <div class="meta-row">
+          <div class="meta-key">Formato</div>
+          <div class="meta-val">CSV (UTF-8)</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Normativa</div>
+          <div class="meta-val">Decreto 1077/2015</div>
+        </div>
+        <div class="meta-row">
+          <div class="meta-key">Secciones</div>
+          <div class="meta-val">4 secciones</div>
+        </div>
+        <hr class="divider">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">
+          El archivo puede abrirse en Excel, Google Sheets o cualquier
+          editor de texto plano.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ALERTAS ══ -->
+  <section class="page" id="page-alertas">
+    <div class="page-header">
+      <h1>Alertas — Orgánico &gt;48h</h1>
+      <p>Residuos orgánicos con más de 48 horas almacenados sin recolectar</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Alertas activas</div>
+        <div id="alertas-lista">
+          <div style="color:var(--text3);font-size:13px;
+                      font-family:var(--font-mono);padding:20px 0;">
+            Cargando alertas...
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">¿Cómo funciona?</div>
+        <div style="font-size:13px;color:var(--text2);
+                    display:flex;flex-direction:column;gap:12px;">
+          <div>
+            🌱 El sistema revisa todas las clasificaciones de tipo
+            <strong>Orgánico</strong> registradas.
+          </div>
+          <div>
+            ⏱️ Calcula las horas transcurridas desde la fecha de recolección
+            hasta el momento actual.
+          </div>
+          <div>
+            🚨 Si superan las <strong>48 horas</strong>, genera una alerta
+            automáticamente y la registra en el sistema.
+          </div>
+          <div>
+            ✅ El administrador puede marcar cada alerta como resuelta
+            una vez atendida.
+          </div>
+        </div>
+        <hr class="divider">
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);">
+          Normativa: Decreto 1077/2015 · Residuos orgánicos
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ HORARIOS ══ -->
+  <section class="page" id="page-horarios">
+    <div class="page-header">
+      <h1>Horarios de Recolección</h1>
+      <p>Consulta los horarios por zona sin necesidad de iniciar sesión
+        → <code>GET /api/horarios</code></p>
+    </div>
+
+    <!-- FILTRO POR ZONA -->
+    <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">Filtrar por zona</div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+        <select class="form-select" id="h-zona-filtro"
+                style="max-width:260px;"
+                onchange="filtrarHorarios()">
+          <option value="">Todas las zonas</option>
+        </select>
+        <button class="btn btn-ghost btn-sm"
+                onclick="filtrarHorarios()">
+          🔍 Filtrar
+        </button>
+        <button class="btn btn-ghost btn-sm"
+                onclick="limpiarFiltroHorarios()">
+          ✕ Limpiar
+        </button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- TABLA DE HORARIOS -->
+      <div>
+        <div class="card-title" style="margin-bottom:12px;">
+          Horarios activos por zona
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Zona</th>
+                <th>Días</th>
+                <th>Horario</th>
+                <th>Tipo</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-horarios"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FORMULARIO ADMIN -->
+      <div id="horarios-admin-section">
+        <div class="card">
+          <div class="card-title">Nuevo horario (solo Admin)</div>
+          <div id="alert-horario" class="alert"></div>
+
+          <div class="form-group">
+            <label class="form-label">Zona <span class="req">*</span></label>
+            <input class="form-input" type="text" id="h-zona"
+                  placeholder="Ej: Zona Norte, Zona Centro">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Días <span class="req">*</span></label>
+            <input class="form-input" type="text" id="h-dias"
+                  placeholder="Ej: Lunes, Miércoles, Viernes">
+          </div>
+          <div class="input-row">
+            <div class="form-group">
+              <label class="form-label">Hora inicio <span class="req">*</span></label>
+              <input class="form-input" type="time" id="h-inicio">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora fin <span class="req">*</span></label>
+              <input class="form-input" type="time" id="h-fin">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de residuo</label>
+            <select class="form-select" id="h-tipo">
+              <option value="General">General</option>
+              <option value="Reciclable">Reciclable</option>
+              <option value="Orgánico">Orgánico</option>
+              <option value="Especial">Especial</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary"
+                    onclick="guardarHorario()">
+              🕐 Crear Horario
+            </button>
+            <button class="btn btn-ghost"
+                    onclick="UI.limpiarForm(['h-zona','h-dias','h-inicio','h-fin'])">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- ══ CAMPAÑAS (SCRUM-18) ══ -->
+  <section class="page" id="page-campanas">
+    <div class="page-header">
+      <div class="story-tag">🎫 SCRUM-18 · Medium</div>
+      <h1>Campañas de Educación Ambiental</h1>
+      <p>Gestión y visualización de campañas de separación en la fuente
+        → <code>GET /api/campanas</code></p>
+    </div>
+
+    <div class="grid-2">
+      <!-- LISTA DE CAMPAÑAS -->
+      <div>
+        <!-- Tabs activas/todas -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+          <button class="btn btn-primary btn-sm" id="btn-todas"
+                  onclick="verCampanas(false)">
+            Todas
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btn-activas"
+                  onclick="verCampanas(true)">
+            Solo activas
+          </button>
+        </div>
+
+        <div id="campanas-lista"></div>
+      </div>
+
+      <!-- FORMULARIO ADMIN -->
+      <div id="campanas-admin-section">
+        <div class="card">
+          <div class="card-title">Nueva campaña (solo Admin)</div>
+          <div id="alert-campana" class="alert"></div>
+
+          <div class="form-group">
+            <label class="form-label">Título <span class="req">*</span></label>
+            <input class="form-input" type="text" id="camp-titulo"
+                  placeholder="Ej: Separa y Recicla">
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Descripción <span class="req">*</span>
+            </label>
+            <textarea class="form-textarea" id="camp-desc"
+                      placeholder="Describe el objetivo de la campaña...">
+            </textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Período</label>
+            <select class="form-select" id="camp-periodo">
+              <option value="">Sin período específico</option>
+              <option>2025 — I Semestre</option>
+              <option>2025 — II Semestre</option>
+              <option>2025 — Anual</option>
+              <option>2026 — Anual</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="guardarCampana()">
+              📢 Crear Campaña
+            </button>
+            <button class="btn btn-ghost"
+                    onclick="UI.limpiarForm(['camp-titulo','camp-desc'],
+                                          'camp-periodo')">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PUNTOS CRÍTICOS (SCRUM-14) ══ -->
+  <section class="page" id="page-puntos-criticos">
+    <div class="page-header">
+      <div class="story-tag">🎫 SCRUM-14 · Medium</div>
+      <h1>Puntos Críticos de Residuos</h1>
+      <p>Reportes ciudadanos de acumulación de residuos
+        → <code>POST /api/puntos-criticos</code></p>
+    </div>
+
+    <!-- RESUMEN STATS -->
+    <div class="grid-4" style="margin-bottom:20px;" id="pc-stats">
+      <div class="stat-card orange">
+        <div class="stat-label">Pendientes</div>
+        <div class="stat-value" id="pc-pendiente">—</div>
+        <div class="stat-unit">reportes</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">En Proceso</div>
+        <div class="stat-value" id="pc-en-proceso">—</div>
+        <div class="stat-unit">reportes</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Resueltos</div>
+        <div class="stat-value" id="pc-resuelto">—</div>
+        <div class="stat-unit">reportes</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">Total</div>
+        <div class="stat-value" id="pc-total">—</div>
+        <div class="stat-unit">reportes</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- LISTA DE REPORTES (Admin) / FORM CIUDADANO -->
+      <div>
+        <!-- Filtro por estado -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" id="pcf-todos"
+                  onclick="filtrarPC('')">Todos</button>
+          <button class="btn btn-ghost btn-sm" id="pcf-pendiente"
+                  onclick="filtrarPC('pendiente')">⏳ Pendientes</button>
+          <button class="btn btn-ghost btn-sm" id="pcf-proceso"
+                  onclick="filtrarPC('en_proceso')">🔧 En proceso</button>
+          <button class="btn btn-ghost btn-sm" id="pcf-resuelto"
+                  onclick="filtrarPC('resuelto')">✅ Resueltos</button>
+        </div>
+        <div id="pc-lista"></div>
+      </div>
+
+      <!-- FORMULARIO — ciudadano y operador pueden reportar -->
+      <div class="card">
+        <div class="card-title">Reportar punto crítico</div>
+        <div id="alert-pc" class="alert"></div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Descripción <span class="req">*</span>
+          </label>
+          <textarea class="form-textarea" id="pc-desc"
+            placeholder="Describe el problema: tipo de residuo,
+  cantidad aproximada, riesgo..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ubicación <span class="req">*</span></label>
+          <input class="form-input" type="text" id="pc-ubicacion"
+                placeholder="Calle, barrio, referencia...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL de imagen (opcional)</label>
+          <input class="form-input" type="text" id="pc-imagen"
+                placeholder="https://... (enlace a foto del punto)">
+          <div class="form-hint">
+            Sube la foto a un servicio como Imgur o Google Fotos
+            y pega el enlace aquí.
+          </div>
+        </div>
+
+        <!-- Vista previa de imagen -->
+        <div id="pc-preview" style="display:none;margin-bottom:16px;">
+          <img id="pc-img-preview"
+              style="width:100%;border-radius:var(--r);
+                      border:1px solid var(--border);max-height:200px;
+                      object-fit:cover;"
+              src="" alt="Vista previa">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="guardarPuntoCritico()">
+            📍 Enviar Reporte
+          </button>
+          <button class="btn btn-ghost"
+                  onclick="UI.limpiarForm(['pc-desc','pc-ubicacion','pc-imagen']);
+                          ocultarPreviewPC()">
+            Limpiar
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MUNICIPIOS (SCRUM-19) ══ -->
+  <section class="page" id="page-municipios">
+    <div class="page-header">
+      <div class="story-tag">🎫 SCRUM-19 · Medium</div>
+      <h1>Gestión de Municipios</h1>
+      <p>Configura y cambia el municipio activo del sistema
+        → <code>GET /api/municipios</code></p>
+    </div>
+
+    <div class="grid-2">
+      <!-- LISTA DE MUNICIPIOS -->
+      <div>
+        <div class="card-title" style="margin-bottom:12px;">
+          Municipios registrados
+        </div>
+        <div id="municipios-lista"></div>
+
+        <!-- Indicadores por municipio -->
+        <div class="card" style="margin-top:16px;">
+          <div class="card-title">
+            Indicadores por municipio seleccionado
+          </div>
+          <div id="municipio-indicadores">
+            <div style="color:var(--text3);font-size:12px;
+                        font-family:var(--font-mono);">
+              Selecciona un municipio para ver sus indicadores.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMULARIO NUEVO MUNICIPIO -->
+      <div class="card">
+        <div class="card-title">Registrar municipio</div>
+        <div id="alert-municipio" class="alert"></div>
+
+        <div class="form-group">
+          <label class="form-label">
+            Nombre <span class="req">*</span>
+          </label>
+          <input class="form-input" type="text" id="mun-nombre"
+                placeholder="Ej: Municipio Norte">
+        </div>
+        <div class="input-row">
+          <div class="form-group">
+            <label class="form-label">Departamento</label>
+            <input class="form-input" type="text" id="mun-depto"
+                  placeholder="Ej: Cundinamarca">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Código DANE</label>
+            <input class="form-input" type="text" id="mun-codigo"
+                  placeholder="Ej: 25001">
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="guardarMunicipio()">
+            🏛 Registrar Municipio
+          </button>
+          <button class="btn btn-ghost"
+                  onclick="UI.limpiarForm(
+                    ['mun-nombre','mun-depto','mun-codigo'])">
+            Limpiar
+          </button>
+        </div>
+
+        <hr class="divider">
+
+        <div style="font-size:12px;color:var(--text2);">
+          <strong style="color:var(--text);">¿Cómo funciona?</strong><br><br>
+          Al cambiar el municipio activo, todos los registros nuevos
+          (cantidades, clasificaciones, diagnósticos) quedan asociados
+          a ese municipio. Los registros anteriores conservan su
+          municipio original y sus indicadores se calculan
+          de forma independiente.
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/auth.js"></script> 
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
