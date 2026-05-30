@@ -4,7 +4,7 @@
  * Todas las llamadas a FastAPI pasan por este módulo.
  */
 
-const BASE_URL = "https://ecogestiondesplegado.onrender.com";
+const BASE_URL = "http://127.0.0.1:8000/api";
 
 // ── Estado del rol activo ─────────────────────────────────────────────────────
 let currentUserId = 1;  // 1 = Admin por defecto
