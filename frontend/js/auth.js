@@ -41,7 +41,7 @@ const Auth = {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/login", {
+      const res = await fetch(`${BASE_URL.replace('/api','')}/api/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ usuario, password }),
@@ -67,7 +67,7 @@ const Auth = {
   async logout() {
     const token = this.obtenerToken();
     if (token) {
-      await fetch("http://127.0.0.1:8000/api/logout", {
+      await fetch(`${BASE_URL.replace('/api','')}/api/logout`, {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}` }
       }).catch(() => {});
